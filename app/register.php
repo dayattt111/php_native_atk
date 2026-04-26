@@ -29,7 +29,8 @@ if (isset($_POST['register'])) {
                                           VALUES ('$nama', '$email', '$passwordHash')");
 
             if ($query) {
-                $success = "Register berhasil! Silakan login.";
+                $success = "Register berhasil! Anda akan diarahkan ke halaman login dalam 2 detik...";
+                header("Refresh: 1; url=login.php");
             } else {
                 $error = "Register gagal!";
             }
