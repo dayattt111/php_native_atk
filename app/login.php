@@ -6,29 +6,50 @@ if (isset($_SESSION['login'])) {
     exit;
 }
 
-$error = "";
+$error   = "";
+$warning = "";
 
 if (isset($_POST['login'])) {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $email    = trim(mysqli_real_escape_string($conn, $_POST['email']));
     $password = $_POST['password'];
 
-    // Query untuk mencari user berdasarkan email
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE email = '$email'");
+    // Query langsung ke tabel users
+    $query = mysqli_query($conn,
+        "SELECT * FROM users WHERE email = '$email' LIMIT 1"
+    );
 
     if (mysqli_num_rows($query) === 1) {
         $user = mysqli_fetch_assoc($query);
-        
-        // Verifikasi password
+
         if (password_verify($password, $user['password'])) {
-            // Set session
-            $_SESSION['login'] = true;
-            $_SESSION['id'] = $user['id'];
-            $_SESSION['nama'] = $user['nama'];
-            $_SESSION['email'] = $user['email'];
-            
-            header("Location: dashboard.php");
-            exit;
+            // Cek status verifikasi email
+            if ($user['status'] === 'nonaktif') {
+                // Catat percobaan login gagal (belum verifikasi)
+                mysqli_query($conn,
+                    "INSERT INTO login (id_user, status) VALUES ({$user['id_user']}, 'gagal')"
+                );
+                $warning = "Akun Anda belum diverifikasi. Silakan cek email <strong>" . htmlspecialchars($email) . "</strong> dan klik tautan verifikasi.";
+            } else {
+                // Catat login berhasil ke tabel login (log)
+                mysqli_query($conn,
+                    "INSERT INTO login (id_user, status) VALUES ({$user['id_user']}, 'berhasil')"
+                );
+
+                // Set session
+                $_SESSION['login']   = true;
+                $_SESSION['id_user'] = $user['id_user'];
+                $_SESSION['nama']    = $user['nama'];
+                $_SESSION['email']   = $user['email'];
+                $_SESSION['role']    = $user['role'];
+
+                header("Location: dashboard.php");
+                exit;
+            }
         } else {
+            // Catat login gagal (password salah)
+            mysqli_query($conn,
+                "INSERT INTO login (id_user, status) VALUES ({$user['id_user']}, 'gagal')"
+            );
             $error = "Password salah!";
         }
     } else {
@@ -56,10 +77,15 @@ if (isset($_POST['login'])) {
             <div class="alert error"><?= htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
+        <?php if ($warning != "") : ?>
+            <div class="alert warning"><?= $warning; ?></div>
+        <?php endif; ?>
+
         <form method="POST">
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" placeholder="Masukkan email Anda" required>
+                <input type="email" name="email" placeholder="Masukkan email Anda" required
+                       value="<?= htmlspecialchars($_POST['email'] ?? ''); ?>">
             </div>
 
             <div class="form-group">

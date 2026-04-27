@@ -109,6 +109,12 @@ body {
     color: #15803d;
 }
 
+.alert.warning {
+    background: #fef9c3;
+    color: #854d0e;
+    border-left: 4px solid #eab308;
+}
+
 /* DASHBOARD */
 .sidebar {
     width: 240px;
