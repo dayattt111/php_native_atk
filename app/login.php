@@ -165,6 +165,70 @@ if (isset($_POST['login'])) {
             font-size: 12px;
             line-height: 1.4;
         }
+
+        /* ======================
+   ROLE DROPDOWN STYLE
+   ====================== */
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 13px 44px 13px 14px;
+    border: 1px solid #d8d8e8;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: all 0.2s ease;
+}
+
+.select-wrapper select:hover {
+    border-color: #667eea;
+    background: #fafaff;
+}
+
+.select-wrapper select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+    background: #ffffff;
+}
+
+.select-wrapper::after {
+    content: "▼";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.select-wrapper select option {
+    color: #333;
+    background: #ffffff;
+    font-size: 14px;
+}
+
+/* Error state for dropdown */
+.form-group.has-error .select-wrapper select {
+    border-color: #dc3545;
+    background: #fff8f8;
+}
+
+.form-group.has-error .select-wrapper::after {
+    color: #dc3545;
+}
     </style>
 </head>
 <body>
@@ -185,12 +249,13 @@ if (isset($_POST['login'])) {
         <form method="POST" novalidate>
             <div class="form-group <?= $fieldErrors["role"] !== "" ? "has-error" : ""; ?>">
                 <label>Role</label>
-                <select name="role">
-                    <option value="">-- Pilih Role --</option>
-                    <option value="admin" <?= $oldRole === "admin" ? "selected" : ""; ?>>Admin</option>
-                    <option value="pelanggan" <?= $oldRole === "pelanggan" ? "selected" : ""; ?>>Pelanggan</option>
-                </select>
-
+                <div class="select-wrapper">
+                    <select name="role">
+                        <option value="">-- Pilih Role --</option>
+                        <option value="admin" <?= $oldRole === "admin" ? "selected" : ""; ?>>Admin</option>
+                        <option value="pelanggan" <?= $oldRole === "pelanggan" ? "selected" : ""; ?>>Pelanggan</option>
+                    </select>
+                </div>
                 <?php if ($fieldErrors["role"] !== "") : ?>
                     <small class="field-error"><?= e($fieldErrors["role"]); ?></small>
                 <?php else : ?>
