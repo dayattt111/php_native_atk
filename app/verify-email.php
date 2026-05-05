@@ -96,7 +96,7 @@ if (!empty($_GET['token'])) {
             <span class="verify-icon">✅</span>
             <h2>Verifikasi Berhasil!</h2>
             <p><?= $message; ?></p>
-            <a href="login.php" class="btn-verify">Masuk ke Dashboard →</a>
+            <a href="dashboard.php" class="btn-verify">Masuk ke Dashboard →</a>
 
         <?php else : ?>
             <span class="verify-icon">❌</span>
