@@ -27,31 +27,26 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Pesanan - Toko ATK</title>
-    <!-- Bootstrap CSS for Modal & Grids -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts & Custom CSS -->
     <link rel="stylesheet" href="style/app.css">
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Scoped overrides to resolve conflicts between Bootstrap and app.css */
-        .pelanggan-layout a {
-            text-decoration: none;
+        /* custom styles for lists inside modal */
+        .modal-item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-        .modal-content {
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-xl);
-        }
-        .modal-header {
+        .modal-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border);
-            padding: 20px 24px;
         }
-        .modal-body {
-            padding: 24px;
-        }
-        .list-group-item {
-            border-color: var(--border);
+        .modal-item-row:last-child {
+            border-bottom: none;
         }
         /* Highlight specific row if anchored */
         tr:target {
@@ -163,48 +158,47 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
                                             <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Bukti
                                         </a>
                                     <?php endif; ?>
-                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalDetail<?= $row['id_transaksi'] ?>">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="openModal('modalDetail<?= $row['id_transaksi'] ?>')">
                                         <i data-lucide="list" style="width: 14px; height: 14px;"></i> Detail
                                     </button>
                                 </div>
 
-                                <!-- Modal Detail Transaksi -->
-                                <div class="modal fade" id="modalDetail<?= $row['id_transaksi'] ?>" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" style="font-weight: 700; color: var(--text-primary);">Detail Transaksi TRX-<?= str_pad($row['id_transaksi'], 5, '0', STR_PAD_LEFT) ?></h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <ul class="list-group list-group-flush">
-                                                    <?php
-                                                    $id_trx = $row['id_transaksi'];
-                                                    $q_detail = mysqli_query($conn, "
-                                                        SELECT p.nama_produk, p.harga, dt.jumlah, dt.subtotal 
-                                                        FROM detail_transaksi dt 
-                                                        JOIN produk p ON dt.id_produk = p.id_produk 
-                                                        WHERE dt.id_transaksi = $id_trx
-                                                    ");
-                                                    while($dt = mysqli_fetch_assoc($q_detail)):
-                                                    ?>
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                                        <div>
-                                                            <h6 class="mb-0" style="font-size: 14px; font-weight: 600; color: var(--text-primary);"><?= htmlspecialchars($dt['nama_produk']) ?></h6>
-                                                            <small class="text-muted"><?= $dt['jumlah'] ?> pcs x Rp <?= number_format($dt['harga'], 0, ',', '.') ?></small>
-                                                        </div>
-                                                        <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Rp <?= number_format($dt['subtotal'], 0, ',', '.') ?></span>
-                                                    </li>
-                                                    <?php endwhile; ?>
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 mt-3" style="border-top: 1px solid var(--border); padding-top: 16px;">
-                                                        <span style="font-weight: 700; font-size: 15px;">TOTAL BAYAR:</span>
-                                                        <span style="font-weight: 700; font-size: 16px; color: var(--primary);">Rp <?= number_format($row['total'], 0, ',', '.') ?></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="modal-footer" style="border-top: 1px solid var(--border); padding: 12px 24px;">
-                                                <button type="button" class="btn btn-secondary w-auto" data-bs-dismiss="modal">Tutup</button>
-                                            </div>
+                                <!-- Custom Modal Detail Transaksi -->
+                                <div class="custom-modal" id="modalDetail<?= $row['id_transaksi'] ?>">
+                                    <div class="custom-modal-content" style="max-width: 500px;">
+                                        <div class="custom-modal-header">
+                                            <h3>Detail Transaksi TRX-<?= str_pad($row['id_transaksi'], 5, '0', STR_PAD_LEFT) ?></h3>
+                                            <button type="button" class="custom-modal-close" onclick="closeModal('modalDetail<?= $row['id_transaksi'] ?>')">&times;</button>
+                                        </div>
+                                        <div class="custom-modal-body">
+                                            <ul class="modal-item-list">
+                                                <?php
+                                                $id_trx = $row['id_transaksi'];
+                                                $q_detail = mysqli_query($conn, "
+                                                    SELECT p.nama_produk, p.harga, dt.jumlah, dt.subtotal 
+                                                    FROM detail_transaksi dt 
+                                                    JOIN produk p ON dt.id_produk = p.id_produk 
+                                                    WHERE dt.id_transaksi = $id_trx
+                                                ");
+                                                while($dt = mysqli_fetch_assoc($q_detail)):
+                                                ?>
+                                                <li class="modal-item-row">
+                                                    <div>
+                                                        <h6 style="margin: 0; font-size: 13px; font-weight: 600; color: var(--text-primary);"><?= htmlspecialchars($dt['nama_produk']) ?></h6>
+                                                        <small class="text-muted"><?= $dt['jumlah'] ?> pcs x Rp <?= number_format($dt['harga'], 0, ',', '.') ?></small>
+                                                    </div>
+                                                    <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Rp <?= number_format($dt['subtotal'], 0, ',', '.') ?></span>
+                                                </li>
+                                                <?php endwhile; ?>
+                                                
+                                                <li class="modal-item-row" style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 12px;">
+                                                    <span style="font-weight: 700; font-size: 14px;">TOTAL BELANJA:</span>
+                                                    <span style="font-weight: 700; font-size: 15px; color: var(--primary);">Rp <?= number_format($row['total'], 0, ',', '.') ?></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="custom-modal-footer">
+                                            <button type="button" class="btn btn-secondary" onclick="closeModal('modalDetail<?= $row['id_transaksi'] ?>')">Tutup</button>
                                         </div>
                                     </div>
                                 </div>
@@ -223,8 +217,6 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
     </div>
 </div>
 
-<!-- Bootstrap Bundle JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Initialize Lucide icons
     lucide.createIcons();
@@ -233,6 +225,22 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
     function toggleNavbar() {
         document.getElementById('navbarMenu').classList.toggle('open');
     }
+
+    // Modal Control Functions
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // Close modal when clicking backdrop
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('custom-modal')) {
+            event.target.classList.remove('open');
+        }
+    });
 </script>
 </body>
 </html>
