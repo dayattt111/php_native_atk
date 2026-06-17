@@ -77,124 +77,163 @@ while ($row = mysqli_fetch_assoc($result_keranjang)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keranjang Saya - Toko ATK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
-    <style>
-        .sidebar ul li a { text-decoration: none; }
-    </style>
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" href="style/app.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>Toko ATK</h2>
-    <h4 style="color: #51cf66; margin: 10px 0;">Pelanggan</h4>
-    <ul>
-        <li><a href="dashboard.php">Dashboard</a></li>
-        <li><a href="belanja.php">Belanja</a></li>
-        <li><a href="keranjang.php" class="active">Keranjang Saya</a></li>
-        <li><a href="riwayat.php">Riwayat Pesanan</a></li>
-        <li><a href="profile.php">Profil</a></li>
-        <li><a href="logout.php" class="logout">Logout</a></li>
-    </ul>
-</div>
-
-<div class="main-content">
-    <div class="topbar">
-        <h1>Keranjang Saya</h1>
-        <p>Halo, <?= htmlspecialchars($nama); ?> (Pelanggan)</p>
-    </div>
-
-    <?php if ($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="pelanggan-layout">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.php" class="navbar-brand">
+                <span>ATK</span> Berkah
+            </a>
+            <button class="navbar-toggle" id="navbarToggle" onclick="toggleNavbar()">
+                <i data-lucide="menu"></i>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="dashboard.php"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                <li><a href="belanja.php"><i data-lucide="shopping-bag"></i> Belanja</a></li>
+                <li><a href="keranjang.php" class="active"><i data-lucide="shopping-cart"></i> Keranjang Saya</a></li>
+                <li><a href="riwayat.php"><i data-lucide="history"></i> Riwayat Pesanan</a></li>
+                <li><a href="profile.php"><i data-lucide="user"></i> Profil</a></li>
+                <li><a href="logout.php" class="logout-nav"><i data-lucide="log-out"></i> Logout</a></li>
+            </ul>
         </div>
-    <?php endif; ?>
-    <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <?= htmlspecialchars($success) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
+    </nav>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card p-4 shadow-sm border-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- TOPBAR -->
+        <div class="topbar" style="margin-bottom: 24px;">
+            <div class="topbar-title">
+                <h1>Keranjang Belanja</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Kelola barang yang ingin Anda beli sebelum melakukan checkout.</p>
+            </div>
+            <div class="topbar-info">
+                <div class="topbar-avatar" style="box-shadow: 0 0 0 2px var(--primary);">
+                    <?= strtoupper(substr($nama, 0, 1)); ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTS -->
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- CART LAYOUT -->
+        <div class="cart-layout">
+            <!-- CART LIST -->
+            <div class="table-section" style="padding: 20px;">
+                <h2 style="margin-bottom: 16px;">Daftar Item Belanja</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <th>Produk</th>
-                                <th>Harga</th>
-                                <th>Kuantitas</th>
+                                <th>Item Produk</th>
+                                <th>Harga Satuan</th>
+                                <th style="width: 220px;">Jumlah Pesanan</th>
                                 <th>Subtotal</th>
-                                <th>Aksi</th>
+                                <th style="width: 100px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($items as $item): ?>
                             <tr>
-                                <td><?= htmlspecialchars($item['nama_produk']) ?></td>
-                                <td>Rp <?= number_format($item['harga'], 0, ',', '.') ?></td>
                                 <td>
-                                    <form method="POST" class="d-flex align-items-center gap-2">
-                                        <input type="hidden" name="id_keranjang" value="<?= $item['id_keranjang'] ?>">
-                                        <input type="number" name="jumlah" class="form-control form-control-sm" value="<?= $item['jumlah'] ?>" min="1" max="<?= $item['jumlah_stok'] ?>" style="width: 70px;">
-                                        <button type="submit" name="update_keranjang" class="btn btn-outline-primary btn-sm w-auto">Update</button>
-                                    </form>
+                                    <strong><?= htmlspecialchars($item['nama_produk']) ?></strong>
                                     <?php if($item['jumlah'] > $item['jumlah_stok']): ?>
-                                        <small class="text-danger d-block mt-1">Melebihi stok (<?= $item['jumlah_stok'] ?>)</small>
+                                        <span class="badge badge-danger" style="margin-top: 4px; display: inline-block;">Stok tidak cukup</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="fw-bold">Rp <?= number_format($item['harga'] * $item['jumlah'], 0, ',', '.') ?></td>
+                                <td>Rp <?= number_format($item['harga'], 0, ',', '.') ?></td>
                                 <td>
-                                    <a href="keranjang.php?hapus=<?= $item['id_keranjang'] ?>" class="btn btn-danger btn-sm w-auto" onclick="return confirm('Hapus item ini?')">Hapus</a>
+                                    <form method="POST" style="display: flex; gap: 8px; align-items: center;">
+                                        <input type="hidden" name="id_keranjang" value="<?= $item['id_keranjang'] ?>">
+                                        <input type="number" name="jumlah" class="form-control" value="<?= $item['jumlah'] ?>" min="1" max="<?= $item['jumlah_stok'] ?>" style="width: 80px; padding: 6px; text-align: center;">
+                                        <button type="submit" name="update_keranjang" class="btn btn-secondary btn-sm" style="padding: 6px 12px;"><i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Update</button>
+                                    </form>
+                                </td>
+                                <td><strong style="color: var(--text-primary);">Rp <?= number_format($item['harga'] * $item['jumlah'], 0, ',', '.') ?></strong></td>
+                                <td>
+                                    <a href="keranjang.php?hapus=<?= $item['id_keranjang'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus item ini?')">
+                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Hapus
+                                    </a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
                             <?php if(count($items) === 0): ?>
                             <tr>
-                                <td colspan="5" class="text-center">Keranjang Anda kosong. Yuk <a href="belanja.php">belanja</a> sekarang!</td>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                                    Keranjang belanja Anda kosong. <a href="belanja.php" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Mulai belanja sekarang!</a>
+                                </td>
                             </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card p-4 shadow-sm border-0 bg-light">
-                <h4 class="mb-3">Ringkasan Pesanan</h4>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Total Item:</span>
-                    <span><?= count($items) ?></span>
+            <!-- CART SUMMARY -->
+            <div class="cart-summary">
+                <h3>Ringkasan Transaksi</h3>
+                <div class="cart-summary-row">
+                    <span>Total Jenis Produk:</span>
+                    <strong><?= count($items) ?> item</strong>
                 </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-4">
-                    <span class="fw-bold fs-5">Total Harga:</span>
-                    <span class="fw-bold fs-5 text-success">Rp <?= number_format($total_belanja, 0, ',', '.') ?></span>
+                <div class="cart-summary-row">
+                    <span>Biaya Pengiriman:</span>
+                    <strong style="color: var(--success-text);">GRATIS</strong>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>Total Tagihan:</span>
+                    <span>Rp <?= number_format($total_belanja, 0, ',', '.') ?></span>
                 </div>
                 
                 <?php if(count($items) > 0): ?>
                 <form action="checkout.php" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Metode Pembayaran</label>
-                        <select name="metode_pembayaran" class="form-select" required>
-                            <option value="cash">Tunai (Cash)</option>
-                            <option value="transfer">Transfer Bank</option>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Pilih Metode Pembayaran</label>
+                        <select name="metode_pembayaran" class="form-control" required>
+                            <option value="cash">Tunai di Toko (COD / Cash)</option>
+                            <option value="transfer">Transfer Bank Mandiri / BCA</option>
                         </select>
                     </div>
-                    <button type="submit" name="checkout" class="btn btn-primary w-100 fw-bold py-2" onclick="return confirm('Lanjutkan ke pembayaran?')">Proses Checkout</button>
+                    <button type="submit" name="checkout" class="btn btn-primary w-100" style="padding: 12px;" onclick="return confirm('Apakah Anda yakin ingin checkout pesanan ini?')">
+                        <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i> Lanjutkan Checkout
+                    </button>
                 </form>
                 <?php else: ?>
-                <button class="btn btn-secondary w-100 py-2" disabled>Proses Checkout</button>
+                <button class="btn btn-secondary w-100" style="padding: 12px; cursor: not-allowed;" disabled>
+                    <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i> Lanjutkan Checkout
+                </button>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle horizontal navbar on mobile
+    function toggleNavbar() {
+        document.getElementById('navbarMenu').classList.toggle('open');
+    }
+</script>
 </body>
 </html>

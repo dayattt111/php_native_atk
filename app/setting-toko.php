@@ -50,7 +50,6 @@ if (isset($_POST['simpan'])) {
 // Fetch current data
 $query = mysqli_query($conn, "SELECT * FROM setting_toko LIMIT 1");
 $setting = mysqli_fetch_assoc($query);
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -58,68 +57,109 @@ $setting = mysqli_fetch_assoc($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setting Toko - Toko ATK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
-    <style>
-        .sidebar ul li a { text-decoration: none; }
-    </style>
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" href="style/app.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>Toko ATK</h2>
-    <h4 style="color: #ff6b6b; margin: 10px 0;">Admin Dashboard</h4>
-    <ul>
-        <li><a href="dashboard.php">Dashboard</a></li>
-        <li><a href="produk.php">Data Barang</a></li>
-        <li><a href="users.php">Kelola User</a></li>
-        <li><a href="laporan.php">Laporan Penjualan</a></li>
-        <li><a href="setting-toko.php" class="active">Setting Toko</a></li>
-        <li><a href="logout.php" class="logout">Logout</a></li>
-    </ul>
-</div>
-
-<div class="main-content">
-    <div class="topbar">
-        <h1>Setting Toko</h1>
-        <p>Halo, <?= htmlspecialchars($nama); ?> (Admin)</p>
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">A</div>
+            <div>
+                <span class="sidebar-logo-text">ATK Berkah</span>
+                <span class="sidebar-logo-sub">Admin Panel</span>
+            </div>
+        </div>
+        <ul>
+            <li><a href="dashboard.php"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+            <li><a href="produk.php"><i data-lucide="package"></i> Data Barang</a></li>
+            <li><a href="users.php"><i data-lucide="users"></i> Kelola User</a></li>
+            <li><a href="verifikasi.php"><i data-lucide="check-square"></i> Verifikasi Pembayaran</a></li>
+            <li><a href="laporan.php"><i data-lucide="file-bar-chart"></i> Laporan Penjualan</a></li>
+            <li><a href="setting-toko.php" class="active"><i data-lucide="settings"></i> Setting Toko</a></li>
+            <li><a href="logout.php" class="logout"><i data-lucide="log-out"></i> Logout</a></li>
+        </ul>
     </div>
 
-    <div class="card p-4 shadow-sm border-0" style="max-width: 600px;">
-        <?php if ($error): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-        <?php if ($success): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-        <?php endif; ?>
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1>Setting Toko</h1>
+            </div>
+            <div class="topbar-info">
+                <div class="topbar-user">
+                    <span class="topbar-user-name"><?= htmlspecialchars($nama); ?></span>
+                    <span class="topbar-user-role">Administrator</span>
+                </div>
+                <div class="topbar-avatar">
+                    <?= strtoupper(substr($nama, 0, 1)); ?>
+                </div>
+            </div>
+        </div>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label">Nama Toko</label>
-                <input type="text" name="nama_toko" class="form-control" value="<?= htmlspecialchars($setting['nama_toko'] ?? '') ?>" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Email Toko</label>
-                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($setting['email'] ?? '') ?>" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Telepon</label>
-                <input type="text" name="telepon" class="form-control" value="<?= htmlspecialchars($setting['telepon'] ?? '') ?>" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Alamat Lengkap</label>
-                <textarea name="alamat" class="form-control" rows="3" required><?= htmlspecialchars($setting['alamat'] ?? '') ?></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="form-label">Deskripsi Singkat</label>
-                <textarea name="deskripsi" class="form-control" rows="3"><?= htmlspecialchars($setting['deskripsi'] ?? '') ?></textarea>
-            </div>
-            
-            <button type="submit" name="simpan" class="btn btn-primary w-auto">Simpan Pengaturan</button>
-        </form>
+        <!-- FORM CONTAINER -->
+        <div class="form-container" style="max-width: 650px; margin: 0;">
+            <?php if ($error): ?>
+                <div class="alert alert-danger">
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="alert alert-success">
+                    <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                    <?= htmlspecialchars($success) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label>Nama Toko</label>
+                    <input type="text" name="nama_toko" class="form-control" value="<?= htmlspecialchars($setting['nama_toko'] ?? '') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Toko</label>
+                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($setting['email'] ?? '') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Nomor Telepon</label>
+                    <input type="text" name="telepon" class="form-control" value="<?= htmlspecialchars($setting['telepon'] ?? '') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Alamat Lengkap</label>
+                    <textarea name="alamat" class="form-control" rows="3" required><?= htmlspecialchars($setting['alamat'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi Singkat Toko</label>
+                    <textarea name="deskripsi" class="form-control" rows="3"><?= htmlspecialchars($setting['deskripsi'] ?? '') ?></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                    <button type="submit" name="simpan" class="btn btn-primary"><i data-lucide="save" style="width: 16px; height: 16px;"></i> Simpan Pengaturan</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    <i data-lucide="menu"></i>
+</button>
+
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle sidebar visibility on mobile
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+</script>
 </body>
 </html>
