@@ -84,51 +84,85 @@ if (isset($_POST['upload'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unggah Bukti Pembayaran - Toko ATK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
-    <style>
-        .sidebar ul li a { text-decoration: none; }
-    </style>
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" href="style/app.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>Toko ATK</h2>
-    <h4 style="color: #51cf66; margin: 10px 0;">Pelanggan</h4>
-    <ul>
-        <li><a href="dashboard.php">Dashboard</a></li>
-        <li><a href="belanja.php">Belanja</a></li>
-        <li><a href="keranjang.php">Keranjang Saya</a></li>
-        <li><a href="riwayat.php" class="active">Riwayat Pesanan</a></li>
-        <li><a href="profile.php">Profil</a></li>
-        <li><a href="logout.php" class="logout">Logout</a></li>
-    </ul>
-</div>
+<div class="pelanggan-layout">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.php" class="navbar-brand">
+                <span>ATK</span> Berkah
+            </a>
+            <button class="navbar-toggle" id="navbarToggle" onclick="toggleNavbar()">
+                <i data-lucide="menu"></i>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="dashboard.php"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                <li><a href="belanja.php"><i data-lucide="shopping-bag"></i> Belanja</a></li>
+                <li><a href="keranjang.php"><i data-lucide="shopping-cart"></i> Keranjang Saya</a></li>
+                <li><a href="riwayat.php" class="active"><i data-lucide="history"></i> Riwayat Pesanan</a></li>
+                <li><a href="profile.php"><i data-lucide="user"></i> Profil</a></li>
+                <li><a href="logout.php" class="logout-nav"><i data-lucide="log-out"></i> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
 
-<div class="main-content">
-    <div class="topbar">
-        <h1>Unggah Bukti</h1>
-        <p>Halo, <?= htmlspecialchars($nama); ?> (Pelanggan)</p>
-    </div>
-
-    <div class="card p-4 shadow-sm border-0" style="max-width: 500px;">
-        <h4 class="mb-4">TRX-<?= str_pad($id_transaksi, 5, '0', STR_PAD_LEFT) ?></h4>
-        
-        <?php if ($error): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label class="form-label">Silakan pilih file bukti transfer Anda (JPG/PNG, maks 2MB)</label>
-                <input class="form-control" type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png" required>
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- TOPBAR -->
+        <div class="topbar" style="margin-bottom: 24px;">
+            <div class="topbar-title">
+                <h1>Unggah Bukti Pembayaran</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Unggah foto/gambar struk transfer bank untuk transaksi Anda.</p>
             </div>
-            <button type="submit" name="upload" class="btn btn-primary w-100 mb-2">Unggah Sekarang</button>
-            <a href="riwayat.php" class="btn btn-secondary w-100">Batal</a>
-        </form>
+            <div class="topbar-info">
+                <div class="topbar-avatar" style="box-shadow: 0 0 0 2px var(--primary);">
+                    <?= strtoupper(substr($nama, 0, 1)); ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="form-container" style="max-width: 550px; margin: 0;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">
+                Pesanan TRX-<?= str_pad($id_transaksi, 5, '0', STR_PAD_LEFT) ?>
+            </h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Harap unggah bukti transfer dalam format JPG, JPEG, atau PNG dengan ukuran file maksimal 2MB.</p>
+            
+            <?php if ($error): ?>
+                <div class="alert alert-danger">
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Pilih File Bukti Struk Transfer</label>
+                    <input class="form-control" type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png" required style="padding: 12px;">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                    <button type="submit" name="upload" class="btn btn-primary" style="flex: 1;"><i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i> Unggah Sekarang</button>
+                    <a href="riwayat.php" class="btn btn-secondary"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Batal</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle horizontal navbar on mobile
+    function toggleNavbar() {
+        document.getElementById('navbarMenu').classList.toggle('open');
+    }
+</script>
 </body>
 </html>

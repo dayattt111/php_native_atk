@@ -84,7 +84,6 @@ mysqli_stmt_execute($stmt);
 $res = mysqli_stmt_get_result($stmt);
 $user_data = mysqli_fetch_assoc($res);
 mysqli_stmt_close($stmt);
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -92,87 +91,133 @@ mysqli_stmt_close($stmt);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Saya - Toko ATK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" href="style/app.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .sidebar ul li a { text-decoration: none; }
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+        @media screen and (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>Toko ATK</h2>
-    <h4 style="color: #51cf66; margin: 10px 0;">Pelanggan</h4>
-    <ul>
-        <li><a href="dashboard.php">Dashboard</a></li>
-        <li><a href="belanja.php">Belanja</a></li>
-        <li><a href="keranjang.php">Keranjang Saya</a></li>
-        <li><a href="riwayat.php">Riwayat Pesanan</a></li>
-        <li><a href="profile.php" class="active">Profil</a></li>
-        <li><a href="logout.php" class="logout">Logout</a></li>
-    </ul>
-</div>
-
-<div class="main-content">
-    <div class="topbar">
-        <h1>Profil Saya</h1>
-        <p>Halo, <?= htmlspecialchars($_SESSION['nama']); ?> (Pelanggan)</p>
-    </div>
-
-    <?php if ($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show" style="max-width: 800px;">
-            <?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="pelanggan-layout">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.php" class="navbar-brand">
+                <span>ATK</span> Berkah
+            </a>
+            <button class="navbar-toggle" id="navbarToggle" onclick="toggleNavbar()">
+                <i data-lucide="menu"></i>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="dashboard.php"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                <li><a href="belanja.php"><i data-lucide="shopping-bag"></i> Belanja</a></li>
+                <li><a href="keranjang.php"><i data-lucide="shopping-cart"></i> Keranjang Saya</a></li>
+                <li><a href="riwayat.php"><i data-lucide="history"></i> Riwayat Pesanan</a></li>
+                <li><a href="profile.php" class="active"><i data-lucide="user"></i> Profil</a></li>
+                <li><a href="logout.php" class="logout-nav"><i data-lucide="log-out"></i> Logout</a></li>
+            </ul>
         </div>
-    <?php endif; ?>
-    <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show" style="max-width: 800px;">
-            <?= htmlspecialchars($success) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
+    </nav>
 
-    <div class="row" style="max-width: 800px;">
-        <div class="col-md-6 mb-4">
-            <div class="card p-4 shadow-sm border-0 h-100">
-                <h4 class="mb-4">Informasi Profil</h4>
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- TOPBAR -->
+        <div class="topbar" style="margin-bottom: 24px;">
+            <div class="topbar-title">
+                <h1>Profil & Pengaturan Akun</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Kelola informasi profil pribadi dan keamanan password Anda.</p>
+            </div>
+            <div class="topbar-info">
+                <div class="topbar-avatar" style="box-shadow: 0 0 0 2px var(--primary);">
+                    <?= strtoupper(substr($nama_session, 0, 1)); ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTS -->
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- PROFILE GRID -->
+        <div class="profile-grid">
+            <!-- EDIT PROFILE -->
+            <div class="form-container" style="max-width: 100%; margin: 0;">
+                <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="user-check" style="width: 20px; height: 20px; color: var(--primary);"></i> Informasi Profil
+                </h2>
                 <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Nama Lengkap</label>
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
                         <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($user_data['nama']) ?>" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Email</label>
+                    <div class="form-group">
+                        <label>Alamat Email</label>
                         <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($user_data['email']) ?>" required>
                     </div>
-                    <button type="submit" name="update_profil" class="btn btn-primary w-100">Simpan Profil</button>
+                    <button type="submit" name="update_profil" class="btn btn-primary" style="width: 100%; margin-top: 16px;">
+                        <i data-lucide="save" style="width: 16px; height: 16px;"></i> Simpan Profil
+                    </button>
                 </form>
             </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card p-4 shadow-sm border-0 h-100">
-                <h4 class="mb-4">Ubah Password</h4>
+            <!-- CHANGE PASSWORD -->
+            <div class="form-container" style="max-width: 100%; margin: 0;">
+                <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--warning);"></i> Perbarui Password
+                </h2>
                 <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Password Lama</label>
-                        <input type="password" name="password_lama" class="form-control" required>
+                    <div class="form-group">
+                        <label>Password Lama</label>
+                        <input type="password" name="password_lama" class="form-control" placeholder="Masukkan password saat ini" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password Baru</label>
-                        <input type="password" name="password_baru" class="form-control" required>
+                    <div class="form-group">
+                        <label>Password Baru</label>
+                        <input type="password" name="password_baru" class="form-control" placeholder="Minimal 6 karakter" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" name="konfirmasi_password" class="form-control" required>
+                    <div class="form-group">
+                        <label>Konfirmasi Password Baru</label>
+                        <input type="password" name="konfirmasi_password" class="form-control" placeholder="Ulangi password baru" required>
                     </div>
-                    <button type="submit" name="ubah_password" class="btn btn-warning w-100 text-dark fw-bold">Ubah Password</button>
+                    <button type="submit" name="ubah_password" class="btn btn-primary" style="width: 100%; margin-top: 16px; background: var(--warning); border-color: var(--warning); color: var(--warning-text);">
+                        <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ubah Password
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle horizontal navbar on mobile
+    function toggleNavbar() {
+        document.getElementById('navbarMenu').classList.toggle('open');
+    }
+</script>
 </body>
 </html>
