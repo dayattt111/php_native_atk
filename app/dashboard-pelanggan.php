@@ -17,10 +17,10 @@ $nama = $_SESSION['nama'];
     <h4 style="color: #51cf66; margin: 10px 0;">Pelanggan</h4>
     <ul>
         <li><a href="dashboard.php" class="active">Dashboard</a></li>
-        <li><a href="#">Belanja</a></li>
-        <li><a href="#">Keranjang Saya</a></li>
-        <li><a href="#">Riwayat Pesanan</a></li>
-        <li><a href="#">Profil</a></li>
+        <li><a href="belanja.php">Belanja</a></li>
+        <li><a href="keranjang.php">Keranjang Saya</a></li>
+        <li><a href="riwayat.php">Riwayat Pesanan</a></li>
+        <li><a href="profile.php">Profil</a></li>
         <li><a href="logout.php" class="logout">Logout</a></li>
     </ul>
 </div>

@@ -98,6 +98,8 @@ CREATE TABLE transaksi (
     tanggal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(10, 2) NOT NULL DEFAULT 0,
     metode_pembayaran ENUM('cash', 'transfer') NOT NULL DEFAULT 'cash',
+    status ENUM('Menunggu Pembayaran', 'Menunggu Verifikasi', 'Pembayaran Disetujui', 'Ditolak') NOT NULL DEFAULT 'Menunggu Pembayaran',
+    bukti_transfer VARCHAR(255) DEFAULT NULL,
 
     CONSTRAINT fk_transaksi_users
         FOREIGN KEY (id_user) REFERENCES users(id_user)
@@ -198,3 +200,23 @@ INSERT INTO detail_transaksi (id_transaksi, id_produk, jumlah, subtotal) VALUES
 --
 -- UPDATE users SET status = 'aktif', email_verified_at = NOW();
 -- (jalankan baris di atas hanya untuk mengaktifkan user lama yang sudah ada)
+
+-- =====================================================
+-- 7. TABEL SETTING TOKO
+-- Menyimpan pengaturan toko
+-- =====================================================
+CREATE TABLE IF NOT EXISTS setting_toko (
+    id_setting INT PRIMARY KEY AUTO_INCREMENT,
+    nama_toko VARCHAR(100) NOT NULL,
+    alamat TEXT NOT NULL,
+    telepon VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    deskripsi TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================
+-- INSERT DATA CONTOH SETTING TOKO
+-- =====================================================
+INSERT INTO setting_toko (nama_toko, alamat, telepon, email, deskripsi) VALUES
+('Toko ATK Berkah', 'Jl. Sudirman No. 123, Jakarta', '081234567890', 'info@tokoatkberkah.com', 'Menyediakan berbagai macam alat tulis kantor murah dan lengkap.');
