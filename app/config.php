@@ -11,7 +11,7 @@ $dotenv->load();
 $host = $_ENV['DB_HOST'] ?? 'localhost';
 $user = $_ENV['DB_USER'] ?? 'root';
 $pass = $_ENV['DB_PASS'] ?? '';
-$db   = $_ENV['DB_NAME'] ?? 'penjualan_atk';
+$db   = $_ENV['DB_NAME'] ?? 'db_atk_2';
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

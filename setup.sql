@@ -219,4 +219,4 @@ CREATE TABLE IF NOT EXISTS setting_toko (
 -- INSERT DATA CONTOH SETTING TOKO
 -- =====================================================
 INSERT INTO setting_toko (nama_toko, alamat, telepon, email, deskripsi) VALUES
-('Toko ATK Berkah', 'Jl. Sudirman No. 123, Jakarta', '081234567890', 'info@tokoatkberkah.com', 'Menyediakan berbagai macam alat tulis kantor murah dan lengkap.');
+('Toko ATK Berkah', 'Jl. Sudirman No. 123, Jakarta', '081234567890', 'info@tokoatkberkah.com', 'Menyediakan berbagai macam alat tulis kantor murah dan lengkap.');
