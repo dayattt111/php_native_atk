@@ -20,12 +20,11 @@ if (!empty($_GET['token'])) {
     if (mysqli_num_rows($query) === 1) {
         $user = mysqli_fetch_assoc($query);
 
-        // Aktifkan akun: set status aktif, catat waktu, hapus token
+        // Aktifkan akun: set status aktif, catat waktu (jangan hapus token untuk audit trail)
         $update = mysqli_query($conn,
             "UPDATE users
              SET status = 'aktif',
-                 email_verified_at = NOW(),
-                 verification_token = NULL
+                 email_verified_at = NOW()
              WHERE id_user = {$user['id_user']}"
         );
 

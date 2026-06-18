@@ -37,6 +37,11 @@ if (isset($_POST['register'])) {
             );
 
             if ($insert) {
+                // DEBUG: Log token yang berhasil disimpan
+                error_log("Token berhasil disimpan untuk email: $email");
+                error_log("Token: $token");
+                error_log("Password hash: $passwordHash");
+                
                 // Kirim email verifikasi via Mailtrap
                 $emailTerkirim = sendVerificationEmail($email, $nama, $token);
 
@@ -46,6 +51,10 @@ if (isset($_POST['register'])) {
                     $success = "Registrasi berhasil, namun email verifikasi gagal dikirim. Hubungi admin.";
                 }
             } else {
+                // DEBUG: Log error insert
+                error_log("INSERT ERROR: " . mysqli_error($conn));
+                error_log("Query: INSERT INTO users (nama, email, password, role, status, verification_token) VALUES ('$nama', '$email', '$passwordHash', 'pelanggan', 'nonaktif', '$token')");
+                
                 $error = "Registrasi gagal: " . mysqli_error($conn);
             }
         }

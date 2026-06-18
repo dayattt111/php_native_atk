@@ -116,10 +116,14 @@ if (isset($_POST['login'])) {
 
                 $fieldErrors["role"] = "Role tidak sesuai. Akun ini terdaftar sebagai {$roleAsli}.";
                 $error = "Role login tidak sesuai. Email ini terdaftar sebagai {$roleAsli}, tetapi Anda memilih {$rolePilih}.";
-            } elseif ($password !== "password") {
+            } elseif (!password_verify($password, $user["password"])) {
+                // DEBUG: Log password verification failure
+                error_log("Password verify failed for user: " . $email);
+                error_log("Hash in DB: " . $user["password"]);
+                
                 insertLoginLog($conn, (int)$user["id_user"], "gagal");
 
-                $fieldErrors["password"] = "Password salah (Input Anda: $password).";
+                $fieldErrors["password"] = "Password salah.";
                 $error = "Password yang Anda masukkan salah.";
             } elseif ($user["status"] === "nonaktif") {
                 insertLoginLog($conn, (int)$user["id_user"], "gagal");
