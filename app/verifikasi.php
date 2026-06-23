@@ -31,7 +31,7 @@ $query = "
     SELECT t.*, u.nama as nama_pelanggan, u.email 
     FROM transaksi t 
     JOIN users u ON t.id_user = u.id_user 
-    WHERE t.metode_pembayaran = 'transfer' 
+    WHERE t.metode_pembayaran IN ('transfer', 'qris') 
     ORDER BY CASE WHEN t.status = 'Menunggu Verifikasi' THEN 1 ELSE 2 END, t.tanggal DESC
 ";
 $result = mysqli_query($conn, $query);
@@ -149,7 +149,8 @@ $result = mysqli_query($conn, $query);
                             <td><span class="badge badge-info">TRX-<?= str_pad($row['id_transaksi'], 5, '0', STR_PAD_LEFT) ?></span></td>
                             <td>
                                 <strong><?= htmlspecialchars($row['nama_pelanggan']) ?></strong><br>
-                                <span style="font-size: 12px; color: var(--text-muted);"><?= htmlspecialchars($row['email']) ?></span>
+                                <span style="font-size: 12px; color: var(--text-muted);"><?= htmlspecialchars($row['email']) ?></span><br>
+                                <span class="badge" style="font-size: 10px; margin-top: 4px; display: inline-block; background-color: <?= $row['metode_pembayaran'] === 'qris' ? '#6f42c1' : '#ffc107' ?>; color: <?= $row['metode_pembayaran'] === 'qris' ? 'white' : 'black' ?>;"><?= strtoupper($row['metode_pembayaran']) ?></span>
                             </td>
                             <td><?= date('d M Y, H:i', strtotime($row['tanggal'])) ?></td>
                             <td><strong style="color: var(--success-text);">Rp <?= number_format($row['total'], 0, ',', '.') ?></strong></td>

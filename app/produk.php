@@ -116,6 +116,7 @@ $result = mysqli_query($conn, $query);
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th style="width: 80px;">Gambar</th>
                             <th>Nama Produk</th>
                             <th>Harga Satuan</th>
                             <th>Jumlah Stok</th>
@@ -129,6 +130,15 @@ $result = mysqli_query($conn, $query);
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
+                            <td>
+                                <?php if ($row['gambar'] && file_exists('uploads/' . $row['gambar'])): ?>
+                                    <img src="uploads/<?= htmlspecialchars($row['gambar']); ?>" alt="Gambar" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); display: block;">
+                                <?php else: ?>
+                                    <div style="width: 50px; height: 50px; border-radius: 6px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; background: #fafafa; color: var(--text-muted);">
+                                        <i data-lucide="image" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
                             <td><strong><?= htmlspecialchars($row['nama_produk']); ?></strong></td>
                             <td>Rp <?= number_format($row['harga'], 0, ',', '.'); ?></td>
                             <td>
@@ -150,7 +160,7 @@ $result = mysqli_query($conn, $query);
                         if(mysqli_num_rows($result) == 0): 
                         ?>
                         <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Tidak ada data produk ditemukan.</td>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Tidak ada data produk ditemukan.</td>
                         </tr>
                         <?php endif; ?>
                     </tbody>

@@ -136,6 +136,8 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
                             <td>
                                 <?php if ($row['metode_pembayaran'] === 'transfer'): ?>
                                     <span class="badge badge-warning">TRANSFER</span>
+                                <?php elseif ($row['metode_pembayaran'] === 'qris'): ?>
+                                    <span class="badge badge-info" style="background: #6f42c1; color: white;">QRIS</span>
                                 <?php else: ?>
                                     <span class="badge badge-success">CASH</span>
                                 <?php endif; ?>
@@ -153,7 +155,7 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <?php if($row['status'] === 'Menunggu Pembayaran' && $row['metode_pembayaran'] === 'transfer'): ?>
+                                    <?php if($row['status'] === 'Menunggu Pembayaran' && in_array($row['metode_pembayaran'], ['transfer', 'qris'])): ?>
                                         <a href="upload-bukti.php?id=<?= $row['id_transaksi'] ?>" class="btn btn-primary btn-sm" style="background: var(--warning); border-color: var(--warning); color: var(--warning-text);">
                                             <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Bukti
                                         </a>

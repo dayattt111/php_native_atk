@@ -13,6 +13,7 @@ if (isset($_POST['tambah'])) {
     $nama_produk = trim($_POST['nama_produk'] ?? "");
     $harga = trim($_POST['harga'] ?? "");
     $stok = trim($_POST['jumlah_stok'] ?? "");
+    $gambar_name = null;
 
     if ($nama_produk === "" || $harga === "" || $stok === "") {
         $error = "Semua field wajib diisi.";
@@ -21,14 +22,47 @@ if (isset($_POST['tambah'])) {
     } elseif (!is_numeric($stok) || $stok < 0) {
         $error = "Stok harus numerik dan tidak boleh minus.";
     } else {
-        $stmt = mysqli_prepare($conn, "INSERT INTO produk (nama_produk, harga, jumlah_stok) VALUES (?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, "sdi", $nama_produk, $harga, $stok);
-        if (mysqli_stmt_execute($stmt)) {
-            $success = "Produk berhasil ditambahkan!";
-        } else {
-            $error = "Gagal menambahkan produk.";
+        // Handle file upload
+        if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] !== 4) {
+            $file = $_FILES['gambar'];
+            $file_name = $file['name'];
+            $file_tmp = $file['tmp_name'];
+            $file_size = $file['size'];
+            $file_error = $file['error'];
+
+            $allowed_ext = ['jpg', 'jpeg', 'png'];
+            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+            if ($file_error !== 0) {
+                $error = "Terjadi kesalahan saat mengunggah gambar.";
+            } elseif (!in_array($file_ext, $allowed_ext)) {
+                $error = "Ekstensi file gambar tidak diizinkan. Hanya boleh jpg, jpeg, png.";
+            } elseif ($file_size > 2000000) { // 2MB
+                $error = "Ukuran gambar terlalu besar. Maksimal 2MB.";
+            } else {
+                if (!is_dir('uploads')) {
+                    mkdir('uploads', 0777, true);
+                }
+                $new_file_name = uniqid('produk_') . '.' . $file_ext;
+                $destination = 'uploads/' . $new_file_name;
+                if (move_uploaded_file($file_tmp, $destination)) {
+                    $gambar_name = $new_file_name;
+                } else {
+                    $error = "Gagal memindahkan file gambar ke direktori tujuan.";
+                }
+            }
         }
-        mysqli_stmt_close($stmt);
+
+        if (empty($error)) {
+            $stmt = mysqli_prepare($conn, "INSERT INTO produk (nama_produk, harga, jumlah_stok, gambar) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "sdis", $nama_produk, $harga, $stok, $gambar_name);
+            if (mysqli_stmt_execute($stmt)) {
+                $success = "Produk berhasil ditambahkan!";
+            } else {
+                $error = "Gagal menambahkan produk.";
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
 }
 ?>
@@ -99,7 +133,7 @@ if (isset($_POST['tambah'])) {
                 </div>
             <?php endif; ?>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Nama Produk</label>
                     <input type="text" name="nama_produk" class="form-control" placeholder="Contoh: Kertas A4 Sinar Dunia" required>
@@ -111,6 +145,10 @@ if (isset($_POST['tambah'])) {
                 <div class="form-group">
                     <label>Jumlah Stok</label>
                     <input type="number" name="jumlah_stok" class="form-control" min="0" placeholder="Contoh: 50" required>
+                </div>
+                <div class="form-group">
+                    <label>Gambar Produk (Opsional)</label>
+                    <input type="file" name="gambar" class="form-control" accept=".jpg,.jpeg,.png" style="padding: 10px;">
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 28px;">
                     <button type="submit" name="tambah" class="btn btn-primary"><i data-lucide="save" style="width: 16px; height: 16px;"></i> Simpan Produk</button>

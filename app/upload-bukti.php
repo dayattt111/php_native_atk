@@ -29,7 +29,7 @@ if (!$transaksi) {
     header("Location: riwayat.php");
     exit;
 }
-if ($transaksi['status'] !== 'Menunggu Pembayaran' || $transaksi['metode_pembayaran'] !== 'transfer') {
+if ($transaksi['status'] !== 'Menunggu Pembayaran' || !in_array($transaksi['metode_pembayaran'], ['transfer', 'qris'])) {
     header("Location: riwayat.php");
     exit;
 }
@@ -118,7 +118,7 @@ if (isset($_POST['upload'])) {
         <div class="topbar" style="margin-bottom: 24px;">
             <div class="topbar-title">
                 <h1>Unggah Bukti Pembayaran</h1>
-                <p style="color: var(--text-secondary); margin-top: 4px;">Unggah foto/gambar struk transfer bank untuk transaksi Anda.</p>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Unggah foto/gambar struk transfer bank atau QRIS untuk transaksi Anda.</p>
             </div>
             <div class="topbar-info">
                 <div class="topbar-avatar" style="box-shadow: 0 0 0 2px var(--primary);">
@@ -132,7 +132,7 @@ if (isset($_POST['upload'])) {
             <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">
                 Pesanan TRX-<?= str_pad($id_transaksi, 5, '0', STR_PAD_LEFT) ?>
             </h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Harap unggah bukti transfer dalam format JPG, JPEG, atau PNG dengan ukuran file maksimal 2MB.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Harap unggah bukti transfer/QRIS dalam format JPG, JPEG, atau PNG dengan ukuran file maksimal 2MB.</p>
             
             <?php if ($error): ?>
                 <div class="alert alert-danger">
@@ -143,7 +143,7 @@ if (isset($_POST['upload'])) {
 
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label>Pilih File Bukti Struk Transfer</label>
+                    <label>Pilih File Bukti Struk Transfer / QRIS</label>
                     <input class="form-control" type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png" required style="padding: 12px;">
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 28px;">

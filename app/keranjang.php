@@ -205,13 +205,51 @@ while ($row = mysqli_fetch_assoc($result_keranjang)) {
                 
                 <?php if(count($items) > 0): ?>
                 <form action="checkout.php" method="POST">
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Pilih Metode Pembayaran</label>
-                        <select name="metode_pembayaran" class="form-control" required>
-                            <option value="cash">Tunai di Toko (COD / Cash)</option>
-                            <option value="transfer">Transfer Bank Mandiri / BCA</option>
-                        </select>
-                    </div>
+<div class="form-group" style="margin-bottom: 20px;">
+    <label>Pilih Metode Pembayaran</label>
+    <select name="metode_pembayaran" id="metode_pembayaran" class="form-control" required onchange="toggleNorek()">
+        <option value="cash">Tunai di Toko (COD / Cash)</option>
+        <option value="transfer">Transfer Bank Mandiri / BCA</option>
+        <option value="qris">QRIS (Pembayaran Instan)</option>
+    </select>
+</div>
+
+<!-- Elemen Informasi Nomor Rekening (Tersembunyi secara default) -->
+<div id="info_norek" style="display: none; margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+    <p style="margin-bottom: 5px; font-weight: bold;">Silahkan transfer ke salah satu rekening berikut:</p>
+    <ul style="list-style: none; padding-left: 0; margin-bottom: 0;">
+        <li style="margin-bottom: 5px;"><strong>Bank Mandiri:</strong> 15200998978 a/n Andi Rara M</li>
+        <li><strong>Bank BCA:</strong> 39980948978 a/n Andi Rara M</li>
+    </ul>
+    <small style="color: #6c757d; display: block; margin-top: 10px;">*Mohon simpan bukti transfer untuk verifikasi di kasir.</small>
+</div>
+
+<!-- Elemen Informasi QRIS (Tersembunyi secara default) -->
+<div id="info_qris" style="display: none; margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #6f42c1; border-radius: 4px; text-align: center;">
+    <p style="margin-bottom: 10px; font-weight: bold; color: var(--text-primary);">Pindai QRIS berikut untuk melakukan pembayaran:</p>
+    <img src="images/qr.jpg" alt="QRIS ATK RARA" style="max-width: 220px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 0 auto; display: block;">
+    <small style="color: #6c757d; display: block; margin-top: 10px;">*Mohon screenshot atau simpan struk bukti transaksi QRIS Anda.</small>
+</div>
+
+<!-- Script untuk memunculkan/menyembunyikan info norek & QRIS -->
+<script>
+function toggleNorek() {
+    var metode = document.getElementById("metode_pembayaran").value;
+    var infoNorek = document.getElementById("info_norek");
+    var infoQris = document.getElementById("info_qris");
+    
+    if (metode === "transfer") {
+        infoNorek.style.display = "block";
+        infoQris.style.display = "none";
+    } else if (metode === "qris") {
+        infoNorek.style.display = "none";
+        infoQris.style.display = "block";
+    } else {
+        infoNorek.style.display = "none";
+        infoQris.style.display = "none";
+    }
+}
+</script>
                     <button type="submit" name="checkout" class="btn btn-primary w-100" style="padding: 12px;" onclick="return confirm('Apakah Anda yakin ingin checkout pesanan ini?')">
                         <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i> Lanjutkan Checkout
                     </button>

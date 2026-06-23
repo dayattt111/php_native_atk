@@ -14,7 +14,7 @@ $id_user = $_SESSION['id_user'];
 $metode_pembayaran = $_POST['metode_pembayaran'] ?? 'cash';
 
 // Validasi metode pembayaran
-if (!in_array($metode_pembayaran, ['cash', 'transfer'])) {
+if (!in_array($metode_pembayaran, ['cash', 'transfer', 'qris'])) {
     die("Metode pembayaran tidak valid.");
 }
 

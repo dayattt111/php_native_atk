@@ -131,8 +131,12 @@ $result_produk = mysqli_query($conn, $query_produk);
             while($row = mysqli_fetch_assoc($result_produk)): 
             ?>
             <div class="product-card">
-                <div class="product-card-img">
-                    <i data-lucide="file-text" style="width: 44px; height: 44px; color: var(--primary); stroke-width: 1.5;"></i>
+                <div class="product-card-img" style="display: flex; align-items: center; justify-content: center; height: 160px; background: #fafafa; border-bottom: 1px solid var(--border); overflow: hidden; border-top-left-radius: var(--radius); border-top-right-radius: var(--radius);">
+                    <?php if ($row['gambar'] && file_exists('uploads/' . $row['gambar'])): ?>
+                        <img src="uploads/<?= htmlspecialchars($row['gambar']) ?>" alt="<?= htmlspecialchars($row['nama_produk']) ?>" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    <?php else: ?>
+                        <i data-lucide="image" style="width: 44px; height: 44px; color: var(--primary); stroke-width: 1.5;"></i>
+                    <?php endif; ?>
                 </div>
                 <h3 class="product-card-title"><?= htmlspecialchars($row['nama_produk']) ?></h3>
                 <div class="product-card-price">Rp <?= number_format($row['harga'], 0, ',', '.') ?></div>

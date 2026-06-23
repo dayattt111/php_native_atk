@@ -102,6 +102,7 @@ $result_transaksi = mysqli_query($conn, $query_transaksi);
                     <option value="bulan_ini" <?= $filter === 'bulan_ini' ? 'selected' : '' ?>>Bulan Ini</option>
                 </select>
                 <button type="submit" class="btn btn-primary"><i data-lucide="sliders" style="width: 16px; height: 16px;"></i> Tampilkan</button>
+                <a href="cetak-laporan.php?filter=<?= urlencode($filter) ?>" target="_blank" class="btn btn-secondary" style="background-color: #dc3545; border-color: #dc3545; color: white; display: inline-flex; align-items: center; gap: 8px;"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Cetak PDF</a>
             </form>
         </div>
 
