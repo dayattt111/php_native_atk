@@ -45,7 +45,7 @@ $query_transaksi = "
 $result_transaksi = mysqli_query($conn, $query_transaksi);
 
 // Buat PDF dengan FPDF
-class PDF extends FPDF {
+class PDF extends \Fpdf\Fpdf {
     // Page header
     function Header() {
         // Logo atau Nama Toko
@@ -163,6 +163,21 @@ while ($row = mysqli_fetch_assoc($result_transaksi)) {
 if (mysqli_num_rows($result_transaksi) == 0) {
     $pdf->Cell(0, 10, 'Tidak ada transaksi terdaftar untuk periode ini.', 1, 1, 'C');
 }
+
+// Tanda Tangan CEO
+$pdf->Ln(15);
+$pdf->Cell(120); // Spacer ke kanan
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(70, 5, 'Rantepao, ' . date('d M Y'), 0, 1, 'C');
+
+$pdf->Cell(120);
+$pdf->Cell(70, 5, 'CEO ATK Rara', 0, 1, 'C');
+
+$pdf->Ln(20); // Space untuk TTD
+
+$pdf->Cell(120);
+$pdf->SetFont('Arial', 'BU', 10);
+$pdf->Cell(70, 5, 'Andri Rara Matandung S.Kom', 0, 1, 'C');
 
 // Output PDF ke browser
 $pdf->Output('I', 'Laporan_Penjualan_' . str_replace(' ', '_', $periode_text) . '.pdf');
