@@ -27,15 +27,25 @@ function sendVerificationEmail(string $toEmail, string $toName, string $token): 
         $mail->SMTPAuth   = true;
         $mail->Username   = $_SERVER['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: '';
         $mail->Password   = $_SERVER['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
-        $mail->Port       = $port;
-        if ($port === 2525) {
-            $mail->SMTPSecure = false;
-            $mail->SMTPAutoTLS = false;
+
+        $port = (int)($_SERVER['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 2525);
+        $mail->Port = $port;
+
+        if ($port == 465) {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         } else {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
+
+        $mail->Timeout = 15;
+        $mail->SMTPKeepAlive = false;
+
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        $mail->Debugoutput = function($str, $level) {
+            error_log($str);
+        };  
+
         // Membaca port, default ke 2525 karena lebih aman di cloud
-        $mail->Port       = (int)($_SERVER['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 2525);
         $mail->CharSet    = 'UTF-8';
 
         // Pengirim & Penerima
