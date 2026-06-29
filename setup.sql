@@ -2,9 +2,9 @@
 -- DATABASE PENJUALAN ATK
 -- =====================================================
 
-DROP DATABASE IF EXISTS penjualan_atk;
-CREATE DATABASE penjualan_atk;
-USE penjualan_atk;
+-- DROP DATABASE IF EXISTS penjualan_atk;
+-- CREATE DATABASE penjualan_atk;
+-- USE penjualan_atk;
 
 -- =====================================================
 -- 1. TABEL USERS
@@ -51,6 +51,7 @@ CREATE TABLE produk (
     nama_produk VARCHAR(100) NOT NULL,
     harga DECIMAL(10, 2) NOT NULL,
     jumlah_stok INT NOT NULL DEFAULT 0,
+    gambar VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
