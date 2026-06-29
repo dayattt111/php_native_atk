@@ -13,28 +13,31 @@ use PHPMailer\PHPMailer\Exception;
  */
 function sendVerificationEmail(string $toEmail, string $toName, string $token): bool
 {
-    $appUrl  = rtrim($_ENV['APP_URL'] ?? 'http://localhost/0PHP_Native', '/');
-    $appName = $_ENV['APP_NAME'] ?? 'Toko ATK';
+    // Perbaikan pembacaan ENV dengan fallback $_SERVER & getenv()
+    $appUrl  = rtrim($_SERVER['APP_URL'] ?? getenv('APP_URL') ?: 'http://localhost/0PHP_Native', '/');
+    $appName = $_SERVER['APP_NAME'] ?? getenv('APP_NAME') ?: 'Toko ATK';
     $verifyLink = $appUrl . '/app/verify-email.php?token=' . urlencode($token);
 
     $mail = new PHPMailer(true);
 
     try {
-        // Server settings – Mailtrap Sandbox SMTP
+        // Server settings – Mailtrap Sandbox SMTP dengan pembacaan $_SERVER / getenv()
         $mail->isSMTP();
-        $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.mailtrap.io';
+        $mail->Host       = $_SERVER['MAIL_HOST'] ?? getenv('MAIL_HOST') ?: 'sandbox.smtp.mailtrap.io';
         $mail->SMTPAuth   = true;
-        $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '';
-        $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? '';
+        $mail->Username   = $_SERVER['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: '';
+        $mail->Password   = $_SERVER['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 587);
+        
+        // Membaca port, default ke 2525 karena lebih aman di cloud
+        $mail->Port       = (int)($_SERVER['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 2525);
         $mail->CharSet    = 'UTF-8';
 
         // Pengirim & Penerima
-        $mail->setFrom(
-            $_ENV['EMAIL_FROM'] ?? 'noreply@toko-atk.com',
-            $_ENV['EMAIL_FROM_NAME'] ?? $appName
-        );
+        $emailFrom     = $_SERVER['EMAIL_FROM'] ?? getenv('EMAIL_FROM') ?: 'noreply@toko-atk.com';
+        $emailFromName = $_SERVER['EMAIL_FROM_NAME'] ?? getenv('EMAIL_FROM_NAME') ?: $appName;
+        
+        $mail->setFrom($emailFrom, $emailFromName);
         $mail->addAddress($toEmail, $toName);
 
         // Konten email
@@ -46,7 +49,7 @@ function sendVerificationEmail(string $toEmail, string $toName, string $token): 
         $mail->send();
         return true;
     } catch (Exception $e) {
-        // Log error tapi jangan tampilkan detail ke user
+        // Log error asli ke catatan Railway agar mudah didebug jika gagal
         error_log('Mailer Error: ' . $mail->ErrorInfo);
         return false;
     }
