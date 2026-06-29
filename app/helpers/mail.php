@@ -50,6 +50,13 @@ function sendVerificationEmail(string $toEmail, string $toName, string $token): 
         $mail->Subject = '✉️ Verifikasi Email Anda – ' . $appName;
         $mail->Body    = buildVerificationEmailHtml($toName, $verifyLink, $appName);
         $mail->AltBody = "Halo $toName,\n\nSilakan klik tautan berikut untuk memverifikasi email Anda:\n$verifyLink\n\nLink berlaku selama 1 jam.\n\n– Tim $appName";
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ];
 
         $mail->send();
         return true;
