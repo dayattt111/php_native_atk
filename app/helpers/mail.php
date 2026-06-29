@@ -1,7 +1,4 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 /**
  * Kirim email verifikasi ke pengguna baru.
@@ -18,61 +15,62 @@ function sendVerificationEmail(string $toEmail, string $toName, string $token): 
     $appName = $_SERVER['APP_NAME'] ?? getenv('APP_NAME') ?: 'Toko ATK';
     $verifyLink = $appUrl . '/app/verify-email.php?token=' . urlencode($token);
 
-    $mail = new PHPMailer(true);
+    $apiToken  = $_SERVER['MAILTRAP_API_TOKEN'] ?? getenv('MAILTRAP_API_TOKEN') ?: '';
+    $inboxId   = $_SERVER['MAILTRAP_INBOX_ID'] ?? getenv('MAILTRAP_INBOX_ID') ?: '';
+    $emailFrom = $_SERVER['EMAIL_FROM'] ?? getenv('EMAIL_FROM') ?: 'noreply@toko-atk.com';
+    $emailFromName = $_SERVER['EMAIL_FROM_NAME'] ?? getenv('EMAIL_FROM_NAME') ?: $appName;
 
-    try {
-        // Server settings – Mailtrap Sandbox SMTP dengan pembacaan $_SERVER / getenv()
-        $mail->isSMTP();
-        $mail->Host       = $_SERVER['MAIL_HOST'] ?? getenv('MAIL_HOST') ?: 'sandbox.smtp.mailtrap.io';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $_SERVER['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: '';
-        $mail->Password   = $_SERVER['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
+    if (!empty($inboxId)) {
+        $url = "https://sandbox.api.mailtrap.io/api/send/" . $inboxId;
+    } else {
+        $url = "https://send.api.mailtrap.io/api/send";
+    }
 
-        $port = (int)($_SERVER['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 2525);
-        $mail->Port = $port;
+    $subject = '✉️ Verifikasi Email Anda – ' . $appName;
+    $htmlContent = buildVerificationEmailHtml($toName, $verifyLink, $appName);
+    $textContent = "Halo $toName,\n\nSilakan klik tautan berikut untuk memverifikasi email Anda:\n$verifyLink\n\nLink berlaku selama 1 jam.\n\n– Tim $appName";
 
-        if ($port == 465) {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        } else {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        }
-
-        $mail->Timeout = 15;
-        $mail->SMTPKeepAlive = false;
-
-        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-        $mail->Debugoutput = function($str, $level) {
-            error_log($str);
-        };  
-
-        // Membaca port, default ke 2525 karena lebih aman di cloud
-        $mail->CharSet    = 'UTF-8';
-
-        // Pengirim & Penerima
-        $emailFrom     = $_SERVER['EMAIL_FROM'] ?? getenv('EMAIL_FROM') ?: 'noreply@toko-atk.com';
-        $emailFromName = $_SERVER['EMAIL_FROM_NAME'] ?? getenv('EMAIL_FROM_NAME') ?: $appName;
-        
-        $mail->setFrom($emailFrom, $emailFromName);
-        $mail->addAddress($toEmail, $toName);
-
-        // Konten email
-        $mail->isHTML(true);
-        $mail->Subject = '✉️ Verifikasi Email Anda – ' . $appName;
-        $mail->Body    = buildVerificationEmailHtml($toName, $verifyLink, $appName);
-        $mail->AltBody = "Halo $toName,\n\nSilakan klik tautan berikut untuk memverifikasi email Anda:\n$verifyLink\n\nLink berlaku selama 1 jam.\n\n– Tim $appName";
-        $mail->SMTPOptions = [
-            'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
+    $payload = [
+        'from' => [
+            'email' => $emailFrom,
+            'name' => $emailFromName
+        ],
+        'to' => [
+            [
+                'email' => $toEmail,
+                'name' => $toName
             ]
-        ];
+        ],
+        'subject' => $subject,
+        'html' => $htmlContent,
+        'text' => $textContent
+    ];
 
-        $mail->send();
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiToken
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        error_log("Mailtrap API cURL Error: " . $curlError);
+        return false;
+    }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
         return true;
-    } catch (Exception $e) {
-        // Log error asli ke catatan Railway agar mudah didebug jika gagal
-        error_log('Mailer Error: ' . $mail->ErrorInfo);
+    } else {
+        error_log("Mailtrap API Error (HTTP Code $httpCode): " . $response);
         return false;
     }
 }
